@@ -1,25 +1,14 @@
-# Download the repo & cd to the directory
+### Installation Instructions
+
+Boot into the Arch Linux Live USB, connect to the internet, and run the following commands:
+
 ```bash
-git clone https://github.com/greysonofusa/Arch-Gaming.git
-```
-#
-```bash
-cd ~/Arch-Gaming
-```
-#
-#Install Waybar Config and Style
-```bash
-cp ~/Arch-Gaming/config.jsonc ~/.config/waybar/config.jsonc
-cp ~/Arch-Gaming/style.css ~/.config/waybar/style.css
-```
-# Wayfire
-```bash
-cp ~/Arch-Gaming/wayfire.ini ~/.config/wayfire.ini
-```
-# Wofi
-```bash
-mkdir -p ~/.config/wofi
-cp ~/Arch-Gaming/config ~/.config/wofi/config
-cp ~/Arch-Gaming/style.css ~/.config/wofi/style.css
-```
-# Reboot system
+# 1. Download the repository
+git clone [https://github.com/greysonofusa/Arch-Gaming.git](https://github.com/greysonofusa/Arch-Gaming.git)
+
+# 2. Navigate to the directory and make the scripts executable
+cd Arch-Gaming
+chmod +x install.sh chroot.sh
+
+# 3. Run the Automated Installer
+./install.sh
