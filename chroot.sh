@@ -64,7 +64,7 @@ pacman -Syu --needed --noconfirm \
     pcmanfm-qt featherpad onlyoffice-bin qt6ct adwaita-icon-theme \
     pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
     ttf-noto-fonts ttf-noto-fonts-emoji ttf-nerd-fonts-symbols polkit \
-    sbctl liquidctl openrgb i2c-tools nwg-look kvantum curl
+    sbctl liquidctl openrgb i2c-tools nwg-look kvantum
 
 # Install Borealis Cursors system-wide directly from GitHub
 echo "Downloading and installing Borealis Cursors..."
