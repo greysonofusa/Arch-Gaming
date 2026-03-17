@@ -64,7 +64,10 @@ pacman -Syu --needed --noconfirm \
     pcmanfm-qt featherpad onlyoffice-bin qt6ct adwaita-icon-theme \
     pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
     ttf-noto-fonts ttf-noto-fonts-emoji ttf-nerd-fonts-symbols polkit \
-    sbctl liquidctl openrgb i2c-tools nwg-look kvantum
+    sbctl liquidctl openrgb i2c-tools nwg-look kvantum curl
 
+# Install Borealis Cursors system-wide directly from GitHub
+echo "Downloading and installing Borealis Cursors..."
+curl -sL https://raw.githubusercontent.com/alvatip/Borealis-cursors/master/archives/Borealis-cursors.tar.gz | tar -xz -C /usr/share/icons/
 # 5. Bootloader & Kernel Config
 sed -i 's/^MODULE
