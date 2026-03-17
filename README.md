@@ -12,3 +12,5 @@ chmod +x install.sh chroot.sh
 
 # 3. Run the Automated Installer
 ./install.sh
+### Preview
+![Waybar Preview](waybar-preview.svg)
