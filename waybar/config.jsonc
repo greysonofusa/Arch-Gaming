@@ -7,7 +7,13 @@
         "custom/launcher",
         "custom/menu"
     ],
-    "modules-center": [],
+    "modules-center": [
+      "custom/onlyoffice",
+      "custom/steam",
+      "custom/cromite",
+      "custom/pcmanfm-qt",
+      "wlr/taskbar"
+],
     "modules-right": [
         "cpu",
         "memory",
@@ -15,8 +21,7 @@
         "pulseaudio",
         "tray",
         "clock",
-        "custom/power",
-        "wlr/taskbar"
+        "custom/power"
     ],
 
     "custom/launcher": {
