@@ -1,5 +1,6 @@
 ### Installation Instructions
-
+### Preview
+![Waybar Preview](waybar-preview.svg)
 Boot into the Arch Linux Live USB, connect to the internet, and run the following commands:
 
 ```bash
@@ -12,5 +13,3 @@ chmod +x install.sh chroot.sh
 
 # 3. Run the Automated Installer
 ./install.sh
-### Preview
-![Waybar Preview](waybar-preview.svg)
