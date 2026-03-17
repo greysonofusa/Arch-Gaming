@@ -13,3 +13,4 @@ insensitive=true
 allow_images=true
 image_size=24
 gtk_dark=true
+term=foot
