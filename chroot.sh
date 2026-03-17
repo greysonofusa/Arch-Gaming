@@ -10,7 +10,8 @@ echo "==============================================================="
 echo " PHASE 2: CHROOT CONFIGURATION (znver4 / RTX 3080 Ti) "
 echo "==============================================================="
 
-ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtimed
+# FIXED: Removed the "d" from localtime
+ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime
 hwclock --systohc
 echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 locale-gen
@@ -50,6 +51,7 @@ pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorl
 echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 pacman -Syy
 
+# FIXED: Added swaylock, swayidle, mako, grim, slurp, wlogout, network-manager-applet, blueman
 pacman -Syu --needed --noconfirm \
     amd-ucode linux-cachyos-nvidia-open nvidia-open nvidia-utils lib32-nvidia-utils \
     wayland wayland-protocols libinput libdrm libxkbcommon pixman \
@@ -61,7 +63,8 @@ pacman -Syu --needed --noconfirm \
     pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
     ttf-noto-fonts ttf-noto-fonts-emoji ttf-jetbrains-mono-nerd polkit sbctl \
     liquidctl openrgb i2c-tools bash-completion \
-    wl-clipboard cliphist wtype
+    wl-clipboard cliphist wtype \
+    swaylock swayidle mako grim slurp wlogout network-manager-applet blueman
 
 sed -i 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /' /etc/mkinitcpio.conf
 mkinitcpio -P
@@ -99,17 +102,6 @@ if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
     export QT_SCALE_FACTOR=1.0
     export GDK_SCALE=1
     export WLR_RENDERER=vulkan
-    # Copy configs and wallpaper
-mkdir -p /home/$USERNAME/.config/waybar /home/$USERNAME/.config/wofi /home/$USERNAME/.config/mango
-mkdir -p /home/$USERNAME/Pictures/Wallpapers
-
-cp /opt/Arch-Gaming/config.conf /home/$USERNAME/.config/mango/config.conf
-cp /opt/Arch-Gaming/waybar/* /home/$USERNAME/.config/waybar/
-cp /opt/Arch-Gaming/wofi/* /home/$USERNAME/.config/wofi/
-cp /opt/Arch-Gaming/wallpaper.jpg /home/$USERNAME/Pictures/Wallpapers/wallpaper.jpg
-
-# Fix ownership so your user has access to everything
-chown -R $USERNAME:$USERNAME /home/$USERNAME/.config /home/$USERNAME/build /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc /home/$USERNAME/Pictures
     exec mango
 fi
 EOF
@@ -142,13 +134,16 @@ RESET="\[\e[0m\]"
 PS1="\n${BLUE}╭─${RESET}[${CYAN}\u${RESET}${BLUE}@${RESET}${PURPLE}\h${RESET}]${BLUE}─${RESET}[${GREEN}\w${RESET}]\n${BLUE}╰─${RED}❯${RESET} "
 EOF
 
-# Copy configs
+# FIXED: Properly consolidated config and wallpaper copying outside of the bash_profile!
 mkdir -p /home/$USERNAME/.config/waybar /home/$USERNAME/.config/wofi /home/$USERNAME/.config/mango
+mkdir -p /home/$USERNAME/Pictures/Wallpapers
+
 cp /opt/Arch-Gaming/config.conf /home/$USERNAME/.config/mango/config.conf
 cp /opt/Arch-Gaming/waybar/* /home/$USERNAME/.config/waybar/
 cp /opt/Arch-Gaming/wofi/* /home/$USERNAME/.config/wofi/
+cp /opt/Arch-Gaming/wallpaper.jpg /home/$USERNAME/Pictures/Wallpapers/wallpaper.jpg
 
-chown -R $USERNAME:$USERNAME /home/$USERNAME/.config /home/$USERNAME/build /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc
+chown -R $USERNAME:$USERNAME /home/$USERNAME/.config /home/$USERNAME/build /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc /home/$USERNAME/Pictures
 
 echo "i2c-dev" | tee /etc/modules-load.d/i2c-dev.conf
 cat << 'SVC' > /etc/systemd/system/liquidctl.service
