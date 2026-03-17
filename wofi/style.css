@@ -1,29 +1,34 @@
 window {
-    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
     font-size: 14px;
-    background-color: rgba(10, 10, 18, 0.97);
-    border: 1px solid rgba(37, 99, 235, 0.50);
-    border-radius: 10px;
-    color: #c9d1e8;
+    /* Deep dark to match the bottom edge of your OLED wallpaper */
+    background-color: rgba(15, 15, 20, 0.95); 
+    /* Arch Blue border to cleanly frame the launcher */
+    border: 2px solid #1793D1; 
+    border-radius: 12px;
+    color: #c0caf5; 
 }
 
 #input {
-    background-color: rgba(20, 20, 35, 0.95);
-    color: #c9d1e8;
-    border: 1px solid rgba(37, 99, 235, 0.35);
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin: 10px;
+    /* Matches the Waybar background */
+    background-color: rgba(26, 27, 38, 0.95);
+    color: #c0caf5;
+    /* Faded Arch Blue when not focused */
+    border: 1px solid rgba(23, 147, 209, 0.5); 
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 15px;
     outline: none;
     font-size: 14px;
 }
 
 #input:focus {
-    border: 1px solid rgba(59, 130, 246, 0.80);
+    /* Classic Light Blue glow on the search bar when typing */
+    border: 1px solid #ADD8E6; 
 }
 
 #inner-box {
-    margin: 0 8px 8px 8px;
+    margin: 0 10px 10px 10px;
 }
 
 #outer-box {
@@ -32,21 +37,24 @@ window {
 }
 
 #entry {
-    padding: 7px 10px;
-    border-radius: 5px;
-    margin: 1px 0;
-    color: #9099b8;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin: 2px 0;
+    color: #a9b1d6;
 }
 
 #entry:selected {
-    background-color: rgba(30, 60, 180, 0.30);
-    color: #e0e8ff;
-    border-left: 3px solid #3b82f6;
+    /* Subtle Light Blue tint for the background highlight */
+    background-color: rgba(173, 216, 230, 0.15); 
+    /* Bright white text so the selected app pops */
+    color: #ffffff; 
+    /* Classic Light Blue side-accent to match Waybar's active app underline */
+    border-left: 3px solid #ADD8E6; 
     padding-left: 7px;
 }
 
 #entry image {
-    margin-right: 8px;
+    margin-right: 12px;
 }
 
 #text {
