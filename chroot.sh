@@ -10,7 +10,7 @@ echo "==============================================================="
 echo " PHASE 2: CHROOT CONFIGURATION (znver4 / RTX 3080 Ti) "
 echo "==============================================================="
 
-ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime
+ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtimed
 hwclock --systohc
 echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 locale-gen
@@ -99,6 +99,17 @@ if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
     export QT_SCALE_FACTOR=1.0
     export GDK_SCALE=1
     export WLR_RENDERER=vulkan
+    # Copy configs and wallpaper
+mkdir -p /home/$USERNAME/.config/waybar /home/$USERNAME/.config/wofi /home/$USERNAME/.config/mango
+mkdir -p /home/$USERNAME/Pictures/Wallpapers
+
+cp /opt/Arch-Gaming/config.conf /home/$USERNAME/.config/mango/config.conf
+cp /opt/Arch-Gaming/waybar/* /home/$USERNAME/.config/waybar/
+cp /opt/Arch-Gaming/wofi/* /home/$USERNAME/.config/wofi/
+cp /opt/Arch-Gaming/wallpaper.jpg /home/$USERNAME/Pictures/Wallpapers/wallpaper.jpg
+
+# Fix ownership so your user has access to everything
+chown -R $USERNAME:$USERNAME /home/$USERNAME/.config /home/$USERNAME/build /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc /home/$USERNAME/Pictures
     exec mango
 fi
 EOF
