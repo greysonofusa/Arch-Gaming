@@ -11,50 +11,49 @@ window#waybar {
     color: #c0caf5;
 }
 
-/* ── Circular Arch Logo Badge ── */
 #custom-launcher {
     color: #ffffff;
     background-color: #1793D1; 
     font-size: 14px;
-    
-    /* Creating the perfect circle */
     border-radius: 50%;
     min-width: 22px;
     padding: 0px 6px 0px 4px;
     margin: 4px 15px 4px 10px;
 }
 
-#custom-menu {
+#custom-file, #custom-edit, #custom-view, #custom-help {
     color: #a9b1d6;
-    padding: 0 15px 0 0;
+    padding: 0 10px;
     font-size: 12px;
+    font-weight: 500;
 }
 
-/* ── Right Side Stats ── */
+#custom-file:hover, #custom-edit:hover, #custom-view:hover, #custom-help:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#custom-onlyoffice, #custom-steam, #custom-cromite, #custom-pcmanfm {
+    font-size: 16px;
+    color: #a9b1d6;
+    padding: 0 12px;
+}
+
+#custom-onlyoffice:hover, #custom-steam:hover, #custom-cromite:hover, #custom-pcmanfm:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#taskbar { margin-left: 10px; }
+#taskbar button { padding: 0 8px; border-bottom: 2px solid transparent; }
+#taskbar button.active { border-bottom: 2px solid #ADD8E6; background-color: rgba(255, 255, 255, 0.05); }
+#taskbar button:hover { background-color: rgba(255, 255, 255, 0.1); }
+
 #cpu, #memory, #network, #pulseaudio, #clock, #tray {
     padding: 0 10px;
     color: #a9b1d6;
     font-size: 12px;
 }
 
-#custom-power {
-    color: #f7768e;
-    padding: 0 15px;
-    font-size: 14px;
-}
-
-/* ── Far Right Taskbar Icons ── */
-#taskbar button {
-    padding: 0 8px;
-    border-bottom: 2px solid transparent;
-}
-
-#taskbar button.active {
-    /* Classic Light Blue underline for the active app */
-    border-bottom: 2px solid #ADD8E6; 
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-#taskbar button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
+#custom-lock { color: #f7768e; padding: 0 15px 0 10px; font-size: 14px; }
+#custom-lock:hover { color: #ff9eaf; }
