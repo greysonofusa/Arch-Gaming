@@ -1,5 +1,4 @@
-# Download the repo & cd to the directory 
-#
+# Download the repo & cd to the directory
 git clone https://github.com/Arch-Gaming.git
 #
 cd ~/Arch-Gaming
