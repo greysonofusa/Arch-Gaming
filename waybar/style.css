@@ -1,5 +1,4 @@
 * {
-    /* Use a standard Nerd Font for icons like the Arch logo */
     font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
     font-size: 13px;
     border: none;
@@ -8,26 +7,30 @@
 }
 
 window#waybar {
-    /* Dark, semi-transparent background to match the photo */
     background-color: rgba(26, 27, 38, 0.95);
     color: #c0caf5;
 }
 
-/* Left Side */
+/* ── Circular Arch Logo Badge ── */
 #custom-launcher {
-    /* Arch Linux Blue */
-    color: #1793D1; 
-    font-size: 18px;
-    padding: 0 15px 0 20px;
+    color: #ffffff;
+    background-color: #1793D1; 
+    font-size: 14px;
+    
+    /* Creating the perfect circle */
+    border-radius: 50%;
+    min-width: 22px;
+    padding: 0px 6px 0px 4px;
+    margin: 4px 15px 4px 10px;
 }
 
 #custom-menu {
     color: #a9b1d6;
-    padding: 0 15px;
+    padding: 0 15px 0 0;
     font-size: 12px;
 }
 
-/* Right Side Stats */
+/* ── Right Side Stats ── */
 #cpu, #memory, #network, #pulseaudio, #clock, #tray {
     padding: 0 10px;
     color: #a9b1d6;
@@ -40,7 +43,7 @@ window#waybar {
     font-size: 14px;
 }
 
-/* Far Right Taskbar Icons */
+/* ── Far Right Taskbar Icons ── */
 #taskbar button {
     padding: 0 8px;
     border-bottom: 2px solid transparent;
