@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# Import variables passed from install.sh
 USERNAME=$1
 USERPASS=$2
 ROOTPASS=$3
@@ -54,7 +53,7 @@ pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorl
 echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 pacman -Syy
 
-# 4. Package Installation
+# 4. Package Installation (Added nwg-look and kvantum)
 pacman -Syu --needed --noconfirm \
     amd-ucode linux-cachyos-nvidia-open nvidia-open nvidia-utils lib32-nvidia-utils \
     wayland wayland-protocols libinput libdrm libxkbcommon pixman \
@@ -64,80 +63,8 @@ pacman -Syu --needed --noconfirm \
     waybar wofi foot swaybg xorg-xwayland git meson ninja curl wget nano \
     pcmanfm-qt featherpad onlyoffice-bin qt6ct adwaita-icon-theme \
     pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
-    ttf-noto-fonts ttf-noto-fonts-emoji polkit sbctl liquidctl openrgb i2c-tools
+    ttf-noto-fonts ttf-noto-fonts-emoji ttf-nerd-fonts-symbols polkit \
+    sbctl liquidctl openrgb i2c-tools nwg-look kvantum
 
 # 5. Bootloader & Kernel Config
-sed -i 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /' /etc/mkinitcpio.conf
-mkinitcpio -P
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet nvidia-drm.modeset=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on"/' /etc/default/grub
-grub-mkconfig -o /boot/grub/grub.cfg
-
-sbctl create-keys
-sbctl enroll-keys -m || true
-sbctl sign -s $(find /boot -name "*.efi" | grep -i "grub" | head -n 1)
-sbctl sign -s /boot/vmlinuz-linux-cachyos
-
-# 6. Compile MangoWM
-mkdir -p /home/$USERNAME/build && cd /home/$USERNAME/build
-git clone -b 0.19.2 https://gitlab.freedesktop.org/wlroots/wlroots.git
-cd wlroots && meson build -Dprefix=/usr && ninja -C build install && cd ..
-git clone -b 0.4.1 https://github.com/wlrfx/scenefx.git
-cd scenefx && meson build -Dprefix=/usr && ninja -C build install && cd ..
-git clone https://github.com/mangowm/mango.git
-cd mango && meson build -Dprefix=/usr && ninja -C build install && cd ..
-
-# 7. Apply Environment & Local GitHub Configs
-cat << 'ENVEOF' > /etc/environment
-GBM_BACKEND=nvidia-drm
-__GLX_VENDOR_LIBRARY_NAME=nvidia
-LIBVA_DRIVER_NAME=nvidia
-QT_QPA_PLATFORM=wayland
-ELECTRON_OZONE_PLATFORM_HINT=wayland
-SDL_VIDEODRIVER=wayland
-_JAVA_AWT_WM_NONREPARENTING=1
-QT_QPA_PLATFORMTHEME=qt6ct
-ENVEOF
-
-# COPY CONFIGS DIRECTLY FROM OUR CLONED REPOSITORY
-mkdir -p /home/$USERNAME/.config/waybar /home/$USERNAME/.config/wofi
-cp /opt/Arch-Gaming/wayfire.ini /home/$USERNAME/.config/wayfire.ini
-cp /opt/Arch-Gaming/waybar/* /home/$USERNAME/.config/waybar/
-cp /opt/Arch-Gaming/wofi/* /home/$USERNAME/.config/wofi/
-
-# Fix ownership so your user can edit them later
-chown -R $USERNAME:$USERNAME /home/$USERNAME/.config /home/$USERNAME/build
-
-# 8. Hardware Automation (AIO & RGB)
-echo "i2c-dev" | tee /etc/modules-load.d/i2c-dev.conf
-
-cat << 'SVC' > /etc/systemd/system/liquidctl.service
-[Unit]
-Description=NZXT Kraken Z73 Control
-After=default.target
-
-[Service]
-Type=oneshot
-ExecStartPre=/usr/bin/liquidctl initialize all
-ExecStart=/usr/bin/liquidctl --match Kraken set pump speed 100
-ExecStart=/usr/bin/liquidctl --match Kraken set fan speed 40
-
-[Install]
-WantedBy=default.target
-SVC
-
-cat << 'SVC' > /etc/systemd/system/openrgb-boot.service
-[Unit]
-Description=OpenRGB Classic Light Blue
-After=default.target i2c.service
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/openrgb --noautoconnect -c ADD8E6
-
-[Install]
-WantedBy=default.target
-SVC
-
-systemctl enable liquidctl.service
-systemctl enable openrgb-boot.service
+sed -i 's/^MODULE
