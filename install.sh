@@ -11,7 +11,12 @@ echo "---------------------------------------------------------------"
 
 lsblk -d -n -o NAME,SIZE,MODEL | grep -v "loop"
 echo ""
-read -p "Enter the disk to install to (e.g., /dev/nvme0n1): " DISK
+read -p "Enter the disk to install to (e.g., nvme0n1 or /dev/nvme0n1): " DISK
+
+# FAILSAFE: Automatically add /dev/ if the user forgets it
+if [[ "$DISK" != /dev/* ]]; then
+    DISK="/dev/$DISK"
+fi
 
 echo ""
 echo "Filesystem Options:"
@@ -38,6 +43,9 @@ sleep 3
 
 timedatectl set-ntp true
 
+# FAILSAFE: Ensure the partitioning tool is actually installed on the Live USB
+pacman -Sy --noconfirm gptfdisk
+
 sgdisk -Z $DISK
 sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI" $DISK
 sgdisk -n 2:0:0 -t 2:8300 -c 2:"ROOT" $DISK
@@ -47,4 +55,32 @@ if [[ $DISK != *"nvme"* ]]; then PART_EFI="${DISK}1"; PART_ROOT="${DISK}2"; fi
 
 mkfs.fat -F32 $PART_EFI
 if [ "$FS_CHOICE" == "btrfs" ]; then
-    mkfs.btrfs -f $
+    mkfs.btrfs -f $PART_ROOT
+else
+    mkfs.f2fs -f -O extra_attr,inode_checksum,sb_checksum $PART_ROOT
+fi
+
+mount $PART_ROOT /mnt
+mount --mkdir $PART_EFI /mnt/boot
+
+if [ "$SWAP_SIZE" != "0" ]; then
+    dd if=/dev/zero of=/mnt/swapfile bs=1M count=${SWAP_SIZE%G}024 status=progress
+    chmod 600 /mnt/swapfile
+    mkswap /mnt/swapfile
+    swapon /mnt/swapfile
+fi
+
+pacstrap -K /mnt base base-devel linux linux-firmware networkmanager nano sudo grub efibootmgr
+genfstab -U /mnt >> /mnt/etc/fstab
+
+echo "--> Copying Arch-Gaming repository into the new system..."
+cp -r "$PWD" /mnt/opt/Arch-Gaming
+
+echo "--> Entering Chroot to finish installation..."
+arch-chroot /mnt /opt/Arch-Gaming/chroot.sh "$USERNAME" "$USERPASS" "$ROOTPASS" "$WANTS_SUDO"
+
+if [ "$SWAP_SIZE" != "0" ]; then swapoff -a; fi
+umount -R /mnt
+echo "---------------------------------------------------------------"
+echo "INSTALLATION COMPLETE! Remove USB and type 'reboot'."
+echo "---------------------------------------------------------------"
