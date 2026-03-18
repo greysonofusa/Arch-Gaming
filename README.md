@@ -1,6 +1,7 @@
 ### Installation Instructions
 ### Preview
 ![Waybar Preview](waybar-preview.svg)
+![Waybar Preview](waybar-preview(2).svg)
 ![Desktop Preview](wallpaper.jpg)
 Boot into the Arch Linux Live USB, connect to the internet, and run the following commands:
 
