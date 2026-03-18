@@ -1,0 +1,112 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 0,
+
+    "modules-left": ["custom/launcher", "custom/file", "custom/edit", "custom/view", "custom/help"],
+    "modules-center": ["custom/onlyoffice", "custom/steam", "custom/cromite", "custom/pcmanfm", "wlr/taskbar"],
+    "modules-right": ["cpu", "memory", "network", "pulseaudio", "tray", "clock", "custom/power"],
+
+    "custom/launcher": {
+        "format": "",
+        "on-click": "wofi --show drun",
+        "tooltip": false
+    },
+    "custom/file": {
+        "format": "File",
+        "on-click": "pcmanfm-qt",
+        "tooltip": false
+    },
+    "custom/edit": {
+        "format": "Edit",
+        "on-click": "cliphist list | wofi -S dmenu -p 'Clipboard' | cliphist decode | wl-copy",
+        "tooltip-format": "Clipboard History"
+    },
+    "custom/view": {
+        "format": "View",
+        "on-click": "wtype -M super s -m super",
+        "tooltip-format": "Expose Windows"
+    },
+    "custom/help": {
+        "format": "Help",
+        "tooltip": false
+    },
+
+    "custom/onlyoffice": {
+        "format": "",
+        "on-click": "onlyoffice-desktopeditors",
+        "tooltip": true,
+        "tooltip-format": "OnlyOffice"
+    },
+    "custom/steam": {
+        "format": "",
+        "on-click": "steam",
+        "tooltip": true,
+        "tooltip-format": "Steam"
+    },
+    "custom/cromite": {
+        "format": "",
+        "on-click": "cromite",
+        "tooltip": true,
+        "tooltip-format": "Browser"
+    },
+    "custom/pcmanfm": {
+        "format": "",
+        "on-click": "pcmanfm-qt",
+        "tooltip": true,
+        "tooltip-format": "File Manager"
+    },
+
+    "custom/power": {
+        "format": "⏻",
+        "on-click": "wlogout",
+        "tooltip": false
+    },
+
+    "wlr/taskbar": {
+        "format": "{icon}",
+        "icon-size": 16,
+        "icon-theme": "Papirus",
+        "tooltip-format": "{title}",
+        "on-click": "activate",
+        "on-click-middle": "close",
+        "ignore-list": ["wofi"]
+    },
+
+    "cpu": {
+        "format": " {usage}%",
+        "on-click": "kitty -e btop"
+    },
+    "memory": {
+        "format": " {used:0.1f}G",
+        "on-click": "kitty -e btop"
+    },
+    "network": {
+        "format-ethernet": " {ipaddr}",
+        "format-wifi": " {signalStrength}%",
+        "format-disconnected": " Disconnected",
+        "tooltip-format-wifi": "{essid} — {signalStrength}%",
+        "tooltip-format-ethernet": "{ifname} — {ipaddr}",
+        "on-click": "nm-connection-editor"
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": " muted",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol",
+        "on-scroll-up": "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 2%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
+    },
+    "tray": {
+        "spacing": 8,
+        "icon-size": 16
+    },
+    "clock": {
+        "format": "{:%a %b %d  %I:%M %p}",
+        "interval": 1,
+        "tooltip-format": "<tt>{calendar}</tt>"
+    }
+}
