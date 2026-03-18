@@ -115,7 +115,7 @@
 <text x="656" y="57" class="power" dominant-baseline="middle" text-anchor="middle">&#9211;</text>
 
 <!-- Title -->
-<text x="340" y="18" class="title" text-anchor="middle">WAYBAR — WAYFIRE DESKTOP — ARCH LINUX</text>
+<text x="340" y="18" class="title" text-anchor="middle">WAYBAR — MANGO DESKTOP — ARCH LINUX</text>
 
 <!-- Section labels -->
 <text x="23" y="90" class="section-label" text-anchor="middle">launcher</text>
