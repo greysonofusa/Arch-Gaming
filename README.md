@@ -19,10 +19,9 @@ chmod +x install.sh chroot.sh
 ### Installation Instructions System Already Installed: waybar/wofi/wtype:
 Make sure you install dependencies:
 Arch: 
-``bash
+```bash
 pacman -S waybar wofi wtype
 ```
-``` 
 Debian/Ubuntu:
 ```bash
 apt install waybar wofi wtype
