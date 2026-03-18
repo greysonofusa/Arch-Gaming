@@ -60,7 +60,7 @@ pacman -Syu --needed --noconfirm \
     liquidctl openrgb i2c-tools bash-completion \
     wl-clipboard cliphist wtype \
     swaylock swayidle mako grim slurp wlogout network-manager-applet blueman \
-    f2fs-tools dosfstools btrfs-progs \
+    f2fs-tools dosfstools btrfs-progs wtype \
     cmake glslang vulkan-headers libdisplay-info seatd hwdata nlohmann-json xorg-xwayland
 
 pacman -Rns --noconfirm linux || true
