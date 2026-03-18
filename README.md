@@ -77,20 +77,20 @@ cp /path/to/your/wallpaper.jpg ~/Pictures/Wallpapers/wallpaper.jpg
 ```
 # Key Bindings
 Key Bindings Quick Reference
-#### KeybindAction
-#### Super+EnterTerminal (kitty)
-#### Super+SpaceApp launcher (wofi)
-#### Super+Q Close window
-#### Super+LLock screen (waylock)
-#### Super+R Reload waybar
-# Super+Shift+R Reload MangoWC config
-# Super+F Toggle float
-# Super+Shift+F Toggle fullscreen
-# Super+0 Overview 
-# Super+1-9Switch workspace
-# Super+Shift+1-9 Move window to workspace
-# PrintScreenshot (full)
-# Shift+PrintScreenshot (region select)
+#### Keybind               Action
+#### Super + Enter         Terminal (kitty)
+#### Super + Space         App launcher (wofi)
+#### Super + Q             Close window
+#### Super + L             Lock screen (waylock)
+#### Super + R             Reload waybar
+#### Super + Shift + R     Reload MangoWC config
+#### Super + F             Toggle float
+#### Super + Shift + F     Toggle fullscreen
+#### Super + 0             Overview / Expose
+#### Super + 1-9           Switch workspace
+#### Super + Shift + 1-9   Move window to workspace
+#### PrintScrn             (full Screen Shot)
+#### Shift + PrintScrn     (Screenshot region select)
 
 ### Special Thanks To
 Splash Art Gradient 8k Desktop Wallpaper Graphic Design by gradienta
