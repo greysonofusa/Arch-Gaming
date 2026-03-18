@@ -69,7 +69,7 @@ sleep 2
 PART_EFI="${DISK}p1"; PART_ROOT="${DISK}p2"
 if [[ $DISK != *"nvme"* ]]; then PART_EFI="${DISK}1"; PART_ROOT="${DISK}2"; fi
 
-# Format partitions (Will now succeed because everything is fully unmounted!)
+# Format partitions
 mkfs.fat -F32 $PART_EFI
 if [ "$FS_CHOICE" == "btrfs" ]; then
     mkfs.btrfs -f $PART_ROOT
@@ -94,6 +94,9 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 echo "--> Copying Arch-Gaming repository into the new system..."
 cp -r "$PWD" /mnt/opt/Arch-Gaming
+
+# THE FIX: Forcefully grant execution rights inside the new drive
+chmod +x /mnt/opt/Arch-Gaming/chroot.sh
 
 echo "--> Entering Chroot to finish installation..."
 arch-chroot /mnt /opt/Arch-Gaming/chroot.sh "$USERNAME" "$USERPASS" "$ROOTPASS" "$WANTS_SUDO"
