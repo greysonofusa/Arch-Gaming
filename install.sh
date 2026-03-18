@@ -1,4 +1,5 @@
 #!/bin/bash
+{
 set -e
 
 clear
@@ -42,7 +43,6 @@ sleep 3
 
 timedatectl set-ntp true
 
-# Silenced the output so the harmless Live ISO errors don't clutter the screen
 pacman -Sy --noconfirm gptfdisk dosfstools f2fs-tools btrfs-progs parted >/dev/null 2>&1 || true
 
 echo "--> Cleaning up old mounts and wiping disk..."
@@ -97,3 +97,4 @@ umount -R /mnt
 echo "---------------------------------------------------------------"
 echo "INSTALLATION COMPLETE! Remove USB and type 'reboot'."
 echo "---------------------------------------------------------------"
+}
