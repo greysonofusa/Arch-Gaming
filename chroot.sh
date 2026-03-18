@@ -7,7 +7,7 @@ ROOTPASS=$3
 WANTS_SUDO=$4
 
 echo "==============================================================="
-echo " PHASE 2: CHROOT CONFIGURATION (znver4 / RTX 3080 Ti) "
+echo " PHASE 2: CHROOT CONFIGURATION (9950X / RTX 3080 Ti) "
 echo "==============================================================="
 
 ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime
@@ -27,21 +27,13 @@ if [[ "$WANTS_SUDO" =~ ^[Yy] ]]; then
     sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 fi
 
+# FIXED: Enable Multilib for Steam and 32-bit gaming libraries!
+sed -i 's/^#\[multilib\]/\[multilib\]/' /etc/pacman.conf
+sed -i '/^\[multilib\]/{n;s/^#//}' /etc/pacman.conf
+
+# FIXED: Install CachyOS repos automatically (It auto-detects 9950X optimizations natively)
 curl -sO https://mirror.cachyos.org/cachyos-repo.tar.xz
 tar xvf cachyos-repo.tar.xz && cd cachyos-repo && ./cachyos-repo.sh && cd ..
-
-sed -i 's/^\[cachyos-v/#\[cachyos-v/g' /etc/pacman.conf
-sed -i 's/^\[cachyos-core-v/#\[cachyos-core-v/g' /etc/pacman.conf
-sed -i 's/^\[cachyos-extra-v/#\[cachyos-extra-v/g' /etc/pacman.conf
-
-awk '/^\[core\]/ { 
-    print "[cachyos-znver4]"
-    print "Include = /etc/pacman.d/cachyos-v4-mirrorlist\n"
-    print "[cachyos-core-znver4]"
-    print "Include = /etc/pacman.d/cachyos-v4-mirrorlist\n"
-    print "[cachyos-extra-znver4]"
-    print "Include = /etc/pacman.d/cachyos-v4-mirrorlist\n"
-} 1' /etc/pacman.conf > /tmp/pacman.conf.new && mv /tmp/pacman.conf.new /etc/pacman.conf
 
 pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
 pacman-key --lsign-key 3056513887B78AEB
@@ -50,6 +42,7 @@ pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorl
 echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 pacman -Syy
 
+# FIXED: Updated the noto-fonts names so they successfully download!
 pacman -Syu --needed --noconfirm \
     amd-ucode linux-cachyos-nvidia-open nvidia-open nvidia-utils lib32-nvidia-utils \
     wayland wayland-protocols libinput libdrm libxkbcommon pixman \
@@ -59,7 +52,7 @@ pacman -Syu --needed --noconfirm \
     waybar wofi foot swaybg git meson ninja curl wget nano \
     pcmanfm-qt featherpad onlyoffice-bin qt6ct adwaita-icon-theme cromite \
     pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
-    ttf-noto-fonts ttf-noto-fonts-emoji ttf-jetbrains-mono-nerd polkit sbctl \
+    noto-fonts noto-fonts-emoji ttf-jetbrains-mono-nerd polkit sbctl \
     liquidctl openrgb i2c-tools bash-completion \
     wl-clipboard cliphist wtype \
     swaylock swayidle mako grim slurp wlogout network-manager-applet blueman
