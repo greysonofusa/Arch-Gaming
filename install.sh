@@ -43,16 +43,22 @@ sleep 3
 
 timedatectl set-ntp true
 
-# FAILSAFE: Ensure the partitioning tool is actually installed on the Live USB
-pacman -Sy --noconfirm gptfdisk
+# FAILSAFE: Ensure partitioning AND formatting tools are installed
+pacman -Sy --noconfirm gptfdisk dosfstools f2fs-tools btrfs-progs parted
 
+# Wipe and create partitions
 sgdisk -Z $DISK
 sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI" $DISK
 sgdisk -n 2:0:0 -t 2:8300 -c 2:"ROOT" $DISK
 
+# Tell the kernel to refresh its partition table immediately to clear warnings
+partprobe $DISK
+sleep 2
+
 PART_EFI="${DISK}p1"; PART_ROOT="${DISK}p2"
 if [[ $DISK != *"nvme"* ]]; then PART_EFI="${DISK}1"; PART_ROOT="${DISK}2"; fi
 
+# Format partitions
 mkfs.fat -F32 $PART_EFI
 if [ "$FS_CHOICE" == "btrfs" ]; then
     mkfs.btrfs -f $PART_ROOT
@@ -60,6 +66,7 @@ else
     mkfs.f2fs -f -O extra_attr,inode_checksum,sb_checksum $PART_ROOT
 fi
 
+# Mount everything
 mount $PART_ROOT /mnt
 mount --mkdir $PART_EFI /mnt/boot
 
@@ -70,6 +77,7 @@ if [ "$SWAP_SIZE" != "0" ]; then
     swapon /mnt/swapfile
 fi
 
+# Install base system
 pacstrap -K /mnt base base-devel linux linux-firmware networkmanager nano sudo grub efibootmgr
 genfstab -U /mnt >> /mnt/etc/fstab
 
