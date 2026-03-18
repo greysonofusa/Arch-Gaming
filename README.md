@@ -1,5 +1,5 @@
 ### Preview
- ![Waybar Preview]( waybar-preview2.svg)
+ ![Waybar Preview](overview.png)
 
 ![Waybar Preview](waybar-1080p-preview.png)![Desktop Preview](wallpaper.jpg)
 
