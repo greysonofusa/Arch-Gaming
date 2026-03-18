@@ -16,13 +16,13 @@ chmod +x install.sh chroot.sh
 # 3. Run the Automated Installer
 ./install.sh
 ```
-### Installation Instructions System Already Installed: waybar/wofi/wtype:
+# Installation Instructions System Already Installed: waybar/wofi/wtype:
 Make sure you install dependencies:
-# Arch: 
+### Arch: 
 ```bash
 pacman -S waybar wofi wtype
 ```
-# Debian/Ubuntu:
+### Debian/Ubuntu:
 ```bash
 apt install waybar wofi wtype
 ```
