@@ -28,8 +28,6 @@ pacman -S waybar wofi wtype
 apt install waybar wofi wtype
 ```
 ### V1 Download the <a href="https://github.com/greysonofusa/Arch-Gaming/tree/main/waybar">waybar</a> and <a href="https://github.com/greysonofusa/Arch-Gaming/tree/main/wofi">wofi</a> .jsonc and .css file to ~/Downloads folder:
-### V2 Download all files in  <a href="https://github.com/greysonofusa/Arch-Gaming/tree/main/Mango%20v2.0">Mango V2 </a> and <a href="https://github.com/greysonofusa/Arch-Gaming/tree/main/wofi">wofi</a> .jsonc and .css file to ~/Downloads folder:
- 
  ```bash
 cp ~/Downloads/config.jsonc ~/.config/waybar/config.jsonc
 cp ~/Downloads/style.css ~/.config/waybar/style.css
@@ -42,6 +40,57 @@ cp ~/Downloads/app-right-click.sh ~/.config/waybar/scripts/
 chmod +x ~/.config/waybar/scripts/*.sh
 pkill waybar; sleep 1 && waybar -c ~/.config/waybar/config.jsonc -s ~/.config/waybar/style.css &
 ```
+### V2 Mango WC Config + Waybar + Wofi Configs
+Clone the repo
+```bash
+git clone https://github.com/greysonofusa/Arch-Gaming.git
+cd Arch-Gaming
+```
+Deploy the Configs
+```bash
+mkdir -p ~/.config/mango
+cp mango/config.conf     ~/.config/mango/config.conf
+cp mango/autostart.sh    ~/.config/mango/autostart.sh
+cp mango/rebar.sh        ~/.config/mango/rebar.sh
+cp mango/config.jsonc    ~/.config/mango/config.jsonc
+cp mango/style.css       ~/.config/mango/style.css
+
+chmod +x ~/.config/mango/autostart.sh
+chmod +x ~/.config/mango/rebar.sh
+```
+Deploy Waybar Scripts
+```bash
+mkdir -p ~/.config/mango/scripts
+
+cp mango/scripts/file-menu.sh         ~/.config/mango/scripts/
+cp mango/scripts/edit-menu.sh         ~/.config/mango/scripts/
+cp mango/scripts/view-menu.sh         ~/.config/mango/scripts/
+cp mango/scripts/power-menu.sh        ~/.config/mango/scripts/
+cp mango/scripts/app-right-click.sh   ~/.config/mango/scripts/
+chmod +x ~/.config/mango/scripts/*.sh
+```
+Set Wallpaper
+```bash
+mkdir -p ~/Pictures/Wallpapers
+# Drop your wallpaper here:
+cp /path/to/your/wallpaper.jpg ~/Pictures/Wallpapers/wallpaper.jpg
+```
+### Key Bindings
+Key Bindings Quick Reference
+# KeybindAction
+# Super+EnterTerminal (kitty)
+# Super+SpaceApp launcher (wofi)
+# Super+Q Close window
+# Super+LLock screen (waylock)
+# Super+R Reload waybar
+# Super+Shift+R Reload MangoWC config
+# Super+F Toggle float
+# Super+Shift+F Toggle fullscreen
+# Super+0 Overview 
+# Super+1-9Switch workspace
+# Super+Shift+1-9 Move window to workspace
+# PrintScreenshot (full)
+# Shift+PrintScreenshot (region select)
 
 ### Special Thanks To
 Splash Art Gradient 8k Desktop Wallpaper Graphic Design by gradienta
