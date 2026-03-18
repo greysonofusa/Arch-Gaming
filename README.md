@@ -17,7 +17,7 @@ chmod +x install.sh chroot.sh
 # 3. Run the Automated Installer
 ./install.sh
 ```
-# I already have an OS installed Install Instructions: waybar/wofi/wtype:
+# I already have a Linux OS Installed: Install Instructions: waybar/wofi/wtype:
 Make sure you install dependencies:
 ### Arch: 
 ```bash
