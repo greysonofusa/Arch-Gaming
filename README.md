@@ -75,14 +75,14 @@ mkdir -p ~/Pictures/Wallpapers
 # Drop your wallpaper here:
 cp /path/to/your/wallpaper.jpg ~/Pictures/Wallpapers/wallpaper.jpg
 ```
-### Key Bindings
+# Key Bindings
 Key Bindings Quick Reference
-# KeybindAction
-# Super+EnterTerminal (kitty)
-# Super+SpaceApp launcher (wofi)
-# Super+Q Close window
-# Super+LLock screen (waylock)
-# Super+R Reload waybar
+#### KeybindAction
+#### Super+EnterTerminal (kitty)
+#### Super+SpaceApp launcher (wofi)
+#### Super+Q Close window
+#### Super+LLock screen (waylock)
+#### Super+R Reload waybar
 # Super+Shift+R Reload MangoWC config
 # Super+F Toggle float
 # Super+Shift+F Toggle fullscreen
