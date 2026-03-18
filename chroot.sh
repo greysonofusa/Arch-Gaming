@@ -45,6 +45,7 @@ rm chaotic-*.pkg.tar.zst
 echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 pacman -Syy
 
+# THE FIX: Added cmake, glslang, vulkan-headers, libdisplay-info, hwdata, seatd, nlohmann-json
 pacman -Syu --needed --noconfirm \
     linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open \
     amd-ucode nvidia-utils lib32-nvidia-utils \
@@ -59,7 +60,8 @@ pacman -Syu --needed --noconfirm \
     liquidctl openrgb i2c-tools bash-completion \
     wl-clipboard cliphist wtype \
     swaylock swayidle mako grim slurp wlogout network-manager-applet blueman \
-    f2fs-tools dosfstools btrfs-progs
+    f2fs-tools dosfstools btrfs-progs \
+    cmake glslang vulkan-headers libdisplay-info seatd hwdata nlohmann-json
 
 pacman -Rns --noconfirm linux || true
 rm -f /etc/mkinitcpio.d/linux.preset
@@ -77,13 +79,26 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sbctl sign -s $(find /boot -name "*.efi" | grep -i "grub" | head -n 1) || true
 sbctl sign -s /boot/vmlinuz-linux-cachyos || true
 
-mkdir -p /home/$USERNAME/build && cd /home/$USERNAME/build
+# THE FIX: Hardcoded direct paths so repos never accidentally nest inside each other!
+mkdir -p /home/$USERNAME/build
+cd /home/$USERNAME/build
+
 git clone -b 0.19.2 https://gitlab.freedesktop.org/wlroots/wlroots.git
-cd wlroots && meson build -Dprefix=/usr && ninja -C build install && cd ..
+cd wlroots
+meson setup build -Dprefix=/usr
+ninja -C build install
+
+cd /home/$USERNAME/build
 git clone -b 0.4.1 https://github.com/wlrfx/scenefx.git
-cd scenefx && meson build -Dprefix=/usr && ninja -C build install && cd ..
+cd scenefx
+meson setup build -Dprefix=/usr
+ninja -C build install
+
+cd /home/$USERNAME/build
 git clone https://github.com/mangowm/mango.git
-cd mango && meson build -Dprefix=/usr && ninja -C build install && cd ..
+cd mango
+meson setup build -Dprefix=/usr
+ninja -C build install
 
 cat << 'EOF' > /home/$USERNAME/.bash_profile
 if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
