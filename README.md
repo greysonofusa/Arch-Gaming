@@ -5,7 +5,7 @@ Version 4 Waybar
 # Installation Instructions: Complete System Install AM4/5 CPU & RTX GPU Only 
 ### Arch + Mango WC (waybar, wofi, wtype) + CachyOS Kernel + AM5 Tweaks With Open RGB scripts and Liquidctl scripts for AIO Coolers: 
 **Disclaimer: If you don't have an AM5 CPU and a NVIDIA RTX GPU this probably won't work for you!**
-Boot into the <a href="https://www.example.com](https://archlinux.org/download/">Arch Linux Live ISO</a>  ], connect to the internet, and run the following commands:
+Before you install: Download the <a href="https://www.example.com](https://archlinux.org/download/">Arch Linux Live ISO,</a>, make it bootable with a USB drive, connect to the internet, and run the following commands:
 ```bash
 # 1. Download the repository
 git clone https://github.com/greysonofusa/Arch-Gaming.git
