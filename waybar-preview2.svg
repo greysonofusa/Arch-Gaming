@@ -33,7 +33,7 @@
 <line x1="162" y1="36" x2="162" y2="70" class="divider"/>
 
 <!-- Pinned: OnlyOffice -->
-<rect x="167" y="38" width="22" height="24" fill="none" stroke="#6688dd" stroke-width="1" rx="2"/>
+<rect x="167" y="38" width="20" height="20" fill="none" stroke="#6688dd" stroke-width="1" rx="2"/>
 <line x1="170" y1="45" x2="186" y2="45" stroke="#6688dd" stroke-width="0.8"/>
 <line x1="170" y1="49" x2="186" y2="49" stroke="#6688dd" stroke-width="0.8"/>
 <line x1="170" y1="53" x2="183" y2="53" stroke="#6688dd" stroke-width="0.8"/>
