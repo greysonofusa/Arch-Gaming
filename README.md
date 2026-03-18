@@ -27,7 +27,7 @@ pacman -S waybar wofi wtype
 ```bash
 apt install waybar wofi wtype
 ```
-Download the waybar .jsonc and .css file to ~/Downloads folder:
+Download the <a href="https://github.com/greysonofusa/Arch-Gaming/tree/main/waybar">waybar</a> and <a href="https://github.com/greysonofusa/Arch-Gaming/tree/main/wofi">wofi</a> .jsonc and .css file to ~/Downloads folder:
  
  ```bash
 cp ~/Downloads/config.jsonc ~/.config/waybar/config.jsonc
