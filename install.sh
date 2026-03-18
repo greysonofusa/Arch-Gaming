@@ -43,22 +43,33 @@ sleep 3
 
 timedatectl set-ntp true
 
-# FAILSAFE: Ensure partitioning AND formatting tools are installed
-pacman -Sy --noconfirm gptfdisk dosfstools f2fs-tools btrfs-progs parted
+# FAILSAFE 1: Ignore harmless Live ISO mkinitcpio hook errors with || true
+pacman -Sy --noconfirm gptfdisk dosfstools f2fs-tools btrfs-progs parted || true
+
+# FAILSAFE 2: Forcibly unmount everything from previous failed runs
+echo "--> Cleaning up old mounts and wiping disk..."
+umount -R /mnt 2>/dev/null || true
+swapoff -a 2>/dev/null || true
+for part in ${DISK}*; do
+    umount "$part" 2>/dev/null || true
+done
+
+# Destroy old partition signatures completely
+wipefs -af $DISK
 
 # Wipe and create partitions
 sgdisk -Z $DISK
 sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI" $DISK
 sgdisk -n 2:0:0 -t 2:8300 -c 2:"ROOT" $DISK
 
-# Tell the kernel to refresh its partition table immediately to clear warnings
+# Tell the kernel to refresh its partition table immediately
 partprobe $DISK
 sleep 2
 
 PART_EFI="${DISK}p1"; PART_ROOT="${DISK}p2"
 if [[ $DISK != *"nvme"* ]]; then PART_EFI="${DISK}1"; PART_ROOT="${DISK}2"; fi
 
-# Format partitions
+# Format partitions (Will now succeed because everything is fully unmounted!)
 mkfs.fat -F32 $PART_EFI
 if [ "$FS_CHOICE" == "btrfs" ]; then
     mkfs.btrfs -f $PART_ROOT
