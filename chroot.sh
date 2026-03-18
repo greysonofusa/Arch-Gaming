@@ -2,99 +2,172 @@
 {
 set -e
 
-clear
-echo "==============================================================="
-echo "   ARCH LINUX AUTOMATED INSTALLER (9950X / T705 OPTIMIZED)     "
-echo "==============================================================="
-echo "Locale   : en_US.UTF-8 (Pre-selected)"
-echo "Keyboard : US (Pre-selected)"
-echo "---------------------------------------------------------------"
-
-lsblk -d -n -o NAME,SIZE,MODEL | grep -v "loop"
-echo ""
-read -p "Enter the disk to install to (e.g., nvme0n1 or /dev/nvme0n1): " DISK
-
-if [[ "$DISK" != /dev/* ]]; then
-    DISK="/dev/$DISK"
-fi
-
-echo ""
-echo "Filesystem Options:"
-echo " 1) btrfs (Snapshots, compression)"
-echo " 2) f2fs  (Recommended for Crucial T705 Gen5 NVMe)"
-read -p "Select Filesystem (btrfs/f2fs) [f2fs]: " FS_CHOICE
-FS_CHOICE=${FS_CHOICE:-f2fs}
-
-echo ""
-echo "Recommendation for T705 & 64GB+ RAM: '0' (No swap needed)."
-read -p "Enter Swap Size (e.g., 4G, 16G, 0 for none) [0]: " SWAP_SIZE
-SWAP_SIZE=${SWAP_SIZE:-0}
-
-echo ""
-read -p "Enter your desired Username: " USERNAME
-read -s -p "Enter Password for $USERNAME: " USERPASS; echo ""
-read -s -p "Enter ROOT Password: " ROOTPASS; echo ""
-read -p "Do you want sudo privileges for $USERNAME? (y/n) [y]: " WANTS_SUDO
-WANTS_SUDO=${WANTS_SUDO:-y}
+USERNAME=$1
+USERPASS=$2
+ROOTPASS=$3
+WANTS_SUDO=$4
 
 echo "==============================================================="
-echo "Starting installation on $DISK in 3 seconds..."
-sleep 3
+echo " PHASE 2: CHROOT CONFIGURATION (9950X / RTX 3080 Ti) "
+echo "==============================================================="
 
-timedatectl set-ntp true
+ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime
+hwclock --systohc
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+locale-gen
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo "KEYMAP=us" > /etc/vconsole.conf
+echo "Arch-Gaming" > /etc/hostname
+systemctl enable NetworkManager
 
-pacman -Sy --noconfirm gptfdisk dosfstools f2fs-tools btrfs-progs parted >/dev/null 2>&1 || true
+echo "root:$ROOTPASS" | chpasswd
+useradd -m -G wheel -s /bin/bash "$USERNAME"
+echo "$USERNAME:$USERPASS" | chpasswd
 
-echo "--> Cleaning up old mounts and wiping disk..."
-umount -R /mnt 2>/dev/null || true
-swapoff -a 2>/dev/null || true
-for part in ${DISK}*; do
-    umount "$part" 2>/dev/null || true
-done
-
-wipefs -af $DISK
-
-sgdisk -Z $DISK
-sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI" $DISK
-sgdisk -n 2:0:0 -t 2:8300 -c 2:"ROOT" $DISK
-
-partprobe $DISK
-sleep 2
-
-PART_EFI="${DISK}p1"; PART_ROOT="${DISK}p2"
-if [[ $DISK != *"nvme"* ]]; then PART_EFI="${DISK}1"; PART_ROOT="${DISK}2"; fi
-
-mkfs.fat -F32 $PART_EFI
-if [ "$FS_CHOICE" == "btrfs" ]; then
-    mkfs.btrfs -f $PART_ROOT
-else
-    mkfs.f2fs -f -O extra_attr,inode_checksum,sb_checksum $PART_ROOT
+if [[ "$WANTS_SUDO" =~ ^[Yy] ]]; then
+    sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 fi
 
-mount $PART_ROOT /mnt
-mount --mkdir $PART_EFI /mnt/boot
+sed -i 's/^#\[multilib\]/\[multilib\]/' /etc/pacman.conf
+sed -i '/^\[multilib\]/{n;s/^#//}' /etc/pacman.conf
 
-if [ "$SWAP_SIZE" != "0" ]; then
-    dd if=/dev/zero of=/mnt/swapfile bs=1M count=${SWAP_SIZE%G}024 status=progress
-    chmod 600 /mnt/swapfile
-    mkswap /mnt/swapfile
-    swapon /mnt/swapfile
+curl -sO https://mirror.cachyos.org/cachyos-repo.tar.xz
+tar xvf cachyos-repo.tar.xz && cd cachyos-repo && ./cachyos-repo.sh && cd ..
+
+pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key 3056513887B78AEB
+
+curl -sLO --retry 3 https://geo-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst
+curl -sLO --retry 3 https://geo-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst
+pacman -U --noconfirm chaotic-keyring.pkg.tar.zst chaotic-mirrorlist.pkg.tar.zst
+rm chaotic-*.pkg.tar.zst
+
+echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
+pacman -Syy
+
+pacman -Syu --needed --noconfirm \
+    linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open \
+    amd-ucode nvidia-utils lib32-nvidia-utils \
+    wayland wayland-protocols libinput libdrm libxkbcommon pixman \
+    qt6-wayland qt5-wayland xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
+    mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader libva-nvidia-driver \
+    steam cachyos-gaming-meta proton-cachyos gamemode lib32-gamemode \
+    waybar wofi foot swaybg git meson ninja curl wget nano \
+    pcmanfm-qt featherpad onlyoffice-bin qt6ct adwaita-icon-theme cromite \
+    pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
+    noto-fonts noto-fonts-emoji ttf-jetbrains-mono-nerd polkit sbctl \
+    liquidctl openrgb i2c-tools bash-completion \
+    wl-clipboard cliphist wtype \
+    swaylock swayidle mako grim slurp wlogout network-manager-applet blueman \
+    f2fs-tools dosfstools btrfs-progs
+
+pacman -Rns --noconfirm linux || true
+rm -f /etc/mkinitcpio.d/linux.preset
+
+sbctl create-keys || true
+sbctl enroll-keys -m || true
+
+sed -i "s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /" /etc/mkinitcpio.conf
+mkinitcpio -P || true
+
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet nvidia-drm.modeset=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on\"/" /etc/default/grub
+grub-mkconfig -o /boot/grub/grub.cfg
+
+sbctl sign -s $(find /boot -name "*.efi" | grep -i "grub" | head -n 1) || true
+sbctl sign -s /boot/vmlinuz-linux-cachyos || true
+
+mkdir -p /home/$USERNAME/build && cd /home/$USERNAME/build
+git clone -b 0.19.2 https://gitlab.freedesktop.org/wlroots/wlroots.git
+cd wlroots && meson build -Dprefix=/usr && ninja -C build install && cd ..
+git clone -b 0.4.1 https://github.com/wlrfx/scenefx.git
+cd scenefx && meson build -Dprefix=/usr && ninja -C build install && cd ..
+git clone https://github.com/mangowm/mango.git
+cd mango && meson build -Dprefix=/usr && ninja -C build install && cd ..
+
+cat << 'EOF' > /home/$USERNAME/.bash_profile
+if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
+if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+    export GBM_BACKEND=nvidia-drm
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export LIBVA_DRIVER_NAME=nvidia
+    export QT_QPA_PLATFORM="wayland;xcb"
+    export QT_QPA_PLATFORMTHEME=qt6ct
+    export SDL_VIDEODRIVER=wayland
+    export ELECTRON_OZONE_PLATFORM_HINT=wayland
+    export _JAVA_AWT_WM_NONREPARENTING=1
+    export QT_AUTO_SCREEN_SCALE_FACTOR=0
+    export QT_ENABLE_HIGHDPI_SCALING=0
+    export QT_SCALE_FACTOR=1.0
+    export GDK_SCALE=1
+    export WLR_RENDERER=vulkan
+    exec mango
 fi
+EOF
 
-pacstrap -K /mnt base base-devel linux linux-firmware networkmanager nano sudo grub efibootmgr
-genfstab -U /mnt >> /mnt/etc/fstab
+cat << 'EOF' > /home/$USERNAME/.bashrc
+[[ $- != *i* ]] && return
+HISTCONTROL=ignoreboth:erasedups
+HISTSIZE=10000
+HISTFILESIZE=20000
+shopt -s histappend checkwinsize cdspell
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then . /etc/bash_completion
+  fi
+fi
+bind 'set completion-ignore-case on'
+bind 'set show-all-if-ambiguous on'
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias update='sudo pacman -Syu'
+RED="\[\e[38;5;196m\]"
+GREEN="\[\e[38;5;46m\]"
+BLUE="\[\e[38;5;39m\]"
+CYAN="\[\e[38;5;51m\]"
+PURPLE="\[\e[38;5;135m\]"
+RESET="\[\e[0m\]"
+PS1="\n${BLUE}╭─${RESET}[${CYAN}\u${RESET}${BLUE}@${RESET}${PURPLE}\h${RESET}]${BLUE}─${RESET}[${GREEN}\w${RESET}]\n${BLUE}╰─${RED}❯${RESET} "
+EOF
 
-echo "--> Copying Arch-Gaming repository into the new system..."
-cp -r "$PWD" /mnt/opt/Arch-Gaming
+mkdir -p /home/$USERNAME/.config/waybar /home/$USERNAME/.config/wofi /home/$USERNAME/.config/mango
+mkdir -p /home/$USERNAME/Pictures/Wallpapers
 
-chmod +x /mnt/opt/Arch-Gaming/chroot.sh
+cp /opt/Arch-Gaming/config.conf /home/$USERNAME/.config/mango/config.conf
+cp /opt/Arch-Gaming/waybar/* /home/$USERNAME/.config/waybar/
+cp /opt/Arch-Gaming/wofi/* /home/$USERNAME/.config/wofi/
+cp /opt/Arch-Gaming/wallpaper.jpg /home/$USERNAME/Pictures/Wallpapers/wallpaper.jpg
 
-echo "--> Entering Chroot to finish installation..."
-arch-chroot /mnt /opt/Arch-Gaming/chroot.sh "$USERNAME" "$USERPASS" "$ROOTPASS" "$WANTS_SUDO"
+chown -R $USERNAME:$USERNAME /home/$USERNAME/.config /home/$USERNAME/build /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc /home/$USERNAME/Pictures
 
-if [ "$SWAP_SIZE" != "0" ]; then swapoff -a; fi
-umount -R /mnt
-echo "---------------------------------------------------------------"
-echo "INSTALLATION COMPLETE! Remove USB and type 'reboot'."
-echo "---------------------------------------------------------------"
+echo "i2c-dev" | tee /etc/modules-load.d/i2c-dev.conf
+cat << 'SVC' > /etc/systemd/system/liquidctl.service
+[Unit]
+Description=NZXT Kraken Z73 Control
+After=default.target
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/liquidctl initialize all
+ExecStart=/usr/bin/liquidctl --match Kraken set pump speed 100
+ExecStart=/usr/bin/liquidctl --match Kraken set fan speed 40
+[Install]
+WantedBy=default.target
+SVC
+
+cat << 'SVC' > /etc/systemd/system/openrgb-boot.service
+[Unit]
+Description=OpenRGB Classic Light Blue
+After=default.target i2c.service
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/openrgb --noautoconnect -c ADD8E6
+[Install]
+WantedBy=default.target
+SVC
+
+systemctl enable liquidctl.service
+systemctl enable openrgb-boot.service
 }
