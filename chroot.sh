@@ -27,22 +27,24 @@ if [[ "$WANTS_SUDO" =~ ^[Yy] ]]; then
     sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 fi
 
-# Enable Multilib for Steam and 32-bit gaming libraries
 sed -i 's/^#\[multilib\]/\[multilib\]/' /etc/pacman.conf
 sed -i '/^\[multilib\]/{n;s/^#//}' /etc/pacman.conf
 
-# Install CachyOS repos
 curl -sO https://mirror.cachyos.org/cachyos-repo.tar.xz
 tar xvf cachyos-repo.tar.xz && cd cachyos-repo && ./cachyos-repo.sh && cd ..
 
 pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
 pacman-key --lsign-key 3056513887B78AEB
-pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
-pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+
+# THE FIX: Use geo-mirror and curl with retries to prevent connection timeouts
+curl -sLO --retry 3 https://geo-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst
+curl -sLO --retry 3 https://geo-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst
+pacman -U --noconfirm chaotic-keyring.pkg.tar.zst chaotic-mirrorlist.pkg.tar.zst
+rm chaotic-*.pkg.tar.zst
+
 echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 pacman -Syy
 
-# THE FIX: Added linux-cachyos kernels explicitly, removed standard nvidia-open
 pacman -Syu --needed --noconfirm \
     linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open \
     amd-ucode nvidia-utils lib32-nvidia-utils \
@@ -58,11 +60,9 @@ pacman -Syu --needed --noconfirm \
     wl-clipboard cliphist wtype \
     swaylock swayidle mako grim slurp wlogout network-manager-applet blueman
 
-# THE FIX: Nuke the stock unoptimized kernel so mkinitcpio doesn't crash trying to build it!
 pacman -Rns --noconfirm linux || true
 rm -f /etc/mkinitcpio.d/linux.preset
 
-# THE FIX: Generate secure boot keys BEFORE mkinitcpio so the hooks don't complain
 sbctl create-keys || true
 sbctl enroll-keys -m || true
 
