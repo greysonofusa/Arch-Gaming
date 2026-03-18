@@ -18,4 +18,7 @@ chmod +x install.sh chroot.sh
 ./install.sh
 ```
 ### Special Thanks To
-[Splash Art Gradient 8k Desktop Wallpaper by gradienta]
+Splash Art Gradient 8k Desktop Wallpaper Graphic Design by gradienta
+DreamMaoMao - Lead Developer of Mango WC
+Alexis Rouillard - Alexays developer of Waybar
+SimplyCEO developer of Wofi
