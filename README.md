@@ -1,11 +1,9 @@
 ### Preview
- ![Waybar Preview](overview.png)
-
+Version 4 Waybar
+![Waybar Preview](overview.png)
 ![Waybar Preview](waybar-1080p-preview.png)![Desktop Preview](wallpaper.jpg)
-
 ### Installation Instructions
 Boot into the Arch Linux Live USB, connect to the internet, and run the following commands:
-
 ```bash
 # 1. Download the repository
 git clone https://github.com/greysonofusa/Arch-Gaming.git
