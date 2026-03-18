@@ -16,3 +16,6 @@ chmod +x install.sh chroot.sh
 
 # 3. Run the Automated Installer
 ./install.sh
+```
+### Special Thanks To
+[Splash Art Gradient 8k Desktop Wallpaper by gradienta]
