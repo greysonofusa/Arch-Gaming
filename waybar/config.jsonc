@@ -49,6 +49,10 @@
         "format": "{:%a %b %d  %H:%M:%S}",
         "interval": 1,
         "tooltip-format": "<tt>{calendar}</tt>"
-    },
-    "custom/lock": { "format": "", "on-click": "swaylock -f --color 000000", "tooltip-format": "Lock Screen" }
+    }
+"custom/power": {
+  "format": "⏻",
+  "on-click": "wlogout",
+  "tooltip": false
+},
 }
