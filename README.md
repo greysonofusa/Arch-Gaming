@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="waybar-1080p-preview.png" alt="Waybar Preview" width="100%"/>
 
 <br/>
 
