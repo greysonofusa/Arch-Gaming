@@ -1,76 +1,100 @@
 #!/bin/bash
+{
 set -e
 
-USERNAME=$1
-USERPASS=$2
-ROOTPASS=$3
-WANTS_SUDO=$4
-
+clear
 echo "==============================================================="
-echo " PHASE 2: CHROOT CONFIGURATION (9950X / RTX 3080 Ti) "
+echo "   ARCH LINUX AUTOMATED INSTALLER (9950X / T705 OPTIMIZED)     "
 echo "==============================================================="
+echo "Locale   : en_US.UTF-8 (Pre-selected)"
+echo "Keyboard : US (Pre-selected)"
+echo "---------------------------------------------------------------"
 
-ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime
-hwclock --systohc
-echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
-locale-gen
-echo "LANG=en_US.UTF-8" > /etc/locale.conf
-echo "KEYMAP=us" > /etc/vconsole.conf
-echo "Arch-Gaming" > /etc/hostname
-systemctl enable NetworkManager
+lsblk -d -n -o NAME,SIZE,MODEL | grep -v "loop"
+echo ""
+read -p "Enter the disk to install to (e.g., nvme0n1 or /dev/nvme0n1): " DISK
 
-echo "root:$ROOTPASS" | chpasswd
-useradd -m -G wheel -s /bin/bash "$USERNAME"
-echo "$USERNAME:$USERPASS" | chpasswd
-
-if [[ "$WANTS_SUDO" =~ ^[Yy] ]]; then
-    sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+if [[ "$DISK" != /dev/* ]]; then
+    DISK="/dev/$DISK"
 fi
 
-sed -i 's/^#\[multilib\]/\[multilib\]/' /etc/pacman.conf
-sed -i '/^\[multilib\]/{n;s/^#//}' /etc/pacman.conf
+echo ""
+echo "Filesystem Options:"
+echo " 1) btrfs (Snapshots, compression)"
+echo " 2) f2fs  (Recommended for Crucial T705 Gen5 NVMe)"
+read -p "Select Filesystem (btrfs/f2fs) [f2fs]: " FS_CHOICE
+FS_CHOICE=${FS_CHOICE:-f2fs}
 
-curl -sO https://mirror.cachyos.org/cachyos-repo.tar.xz
-tar xvf cachyos-repo.tar.xz && cd cachyos-repo && ./cachyos-repo.sh && cd ..
+echo ""
+echo "Recommendation for T705 & 64GB+ RAM: '0' (No swap needed)."
+read -p "Enter Swap Size (e.g., 4G, 16G, 0 for none) [0]: " SWAP_SIZE
+SWAP_SIZE=${SWAP_SIZE:-0}
 
-pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-pacman-key --lsign-key 3056513887B78AEB
+echo ""
+read -p "Enter your desired Username: " USERNAME
+read -s -p "Enter Password for $USERNAME: " USERPASS; echo ""
+read -s -p "Enter ROOT Password: " ROOTPASS; echo ""
+read -p "Do you want sudo privileges for $USERNAME? (y/n) [y]: " WANTS_SUDO
+WANTS_SUDO=${WANTS_SUDO:-y}
 
-curl -sLO --retry 3 https://geo-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst
-curl -sLO --retry 3 https://geo-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst
-pacman -U --noconfirm chaotic-keyring.pkg.tar.zst chaotic-mirrorlist.pkg.tar.zst
-rm chaotic-*.pkg.tar.zst
+echo "==============================================================="
+echo "Starting installation on $DISK in 3 seconds..."
+sleep 3
 
-echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
-pacman -Syy
+timedatectl set-ntp true
 
-# THE FIX: Added f2fs-tools, dosfstools, and btrfs-progs to the internal OS
-pacman -Syu --needed --noconfirm \
-    linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open \
-    amd-ucode nvidia-utils lib32-nvidia-utils \
-    wayland wayland-protocols libinput libdrm libxkbcommon pixman \
-    qt6-wayland qt5-wayland xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
-    mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader libva-nvidia-driver \
-    steam cachyos-gaming-meta proton-cachyos gamemode lib32-gamemode \
-    waybar wofi foot swaybg git meson ninja curl wget nano \
-    pcmanfm-qt featherpad onlyoffice-bin qt6ct adwaita-icon-theme cromite \
-    pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
-    noto-fonts noto-fonts-emoji ttf-jetbrains-mono-nerd polkit sbctl \
-    liquidctl openrgb i2c-tools bash-completion \
-    wl-clipboard cliphist wtype \
-    swaylock swayidle mako grim slurp wlogout network-manager-applet blueman \
-    f2fs-tools dosfstools btrfs-progs
+pacman -Sy --noconfirm gptfdisk dosfstools f2fs-tools btrfs-progs parted >/dev/null 2>&1 || true
 
-pacman -Rns --noconfirm linux || true
-rm -f /etc/mkinitcpio.d/linux.preset
+echo "--> Cleaning up old mounts and wiping disk..."
+umount -R /mnt 2>/dev/null || true
+swapoff -a 2>/dev/null || true
+for part in ${DISK}*; do
+    umount "$part" 2>/dev/null || true
+done
 
-sbctl create-keys || true
-sbctl enroll-keys -m || true
+wipefs -af $DISK
 
-sed -i 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /' /etc/mkinitcpio.conf
+sgdisk -Z $DISK
+sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI" $DISK
+sgdisk -n 2:0:0 -t 2:8300 -c 2:"ROOT" $DISK
 
-# THE FIX: Added safety net so mkinitcpio warnings don't abort the script
-mkinitcpio -P || true
+partprobe $DISK
+sleep 2
 
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet nvidia-drm.modeset=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=
+PART_EFI="${DISK}p1"; PART_ROOT="${DISK}p2"
+if [[ $DISK != *"nvme"* ]]; then PART_EFI="${DISK}1"; PART_ROOT="${DISK}2"; fi
+
+mkfs.fat -F32 $PART_EFI
+if [ "$FS_CHOICE" == "btrfs" ]; then
+    mkfs.btrfs -f $PART_ROOT
+else
+    mkfs.f2fs -f -O extra_attr,inode_checksum,sb_checksum $PART_ROOT
+fi
+
+mount $PART_ROOT /mnt
+mount --mkdir $PART_EFI /mnt/boot
+
+if [ "$SWAP_SIZE" != "0" ]; then
+    dd if=/dev/zero of=/mnt/swapfile bs=1M count=${SWAP_SIZE%G}024 status=progress
+    chmod 600 /mnt/swapfile
+    mkswap /mnt/swapfile
+    swapon /mnt/swapfile
+fi
+
+pacstrap -K /mnt base base-devel linux linux-firmware networkmanager nano sudo grub efibootmgr
+genfstab -U /mnt >> /mnt/etc/fstab
+
+echo "--> Copying Arch-Gaming repository into the new system..."
+cp -r "$PWD" /mnt/opt/Arch-Gaming
+
+chmod +x /mnt/opt/Arch-Gaming/chroot.sh
+
+echo "--> Entering Chroot to finish installation..."
+arch-chroot /mnt /opt/Arch-Gaming/chroot.sh "$USERNAME" "$USERPASS" "$ROOTPASS" "$WANTS_SUDO"
+
+if [ "$SWAP_SIZE" != "0" ]; then swapoff -a; fi
+umount -R /mnt
+echo "---------------------------------------------------------------"
+echo "INSTALLATION COMPLETE! Remove USB and type 'reboot'."
+echo "---------------------------------------------------------------"
+}
