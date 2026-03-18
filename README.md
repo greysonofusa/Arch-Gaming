@@ -92,8 +92,8 @@ Key Bindings Quick Reference
 #### PrintScrn             (full Screen Shot)
 #### Shift + PrintScrn     (Screenshot region select)
 
-### Special Thanks To
-Splash Art Gradient 8k Desktop Wallpaper Graphic Design by gradienta
-DreamMaoMao - Lead Developer of Mango WC
-Alexis Rouillard - Alexays developer of Waybar
-SimplyCEO developer of Wofi
+# Special Thanks To
+#### Splash Art - Gradient 8k Desktop Wallpaper Graphic Design by gradienta
+#### DreamMaoMao - Lead Developer of Mango WC
+#### Alexis Rouillard - Alexays developer of Waybar
+#### SimplyCEO developer of Wofi
