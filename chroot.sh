@@ -27,11 +27,11 @@ if [[ "$WANTS_SUDO" =~ ^[Yy] ]]; then
     sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 fi
 
-# FIXED: Enable Multilib for Steam and 32-bit gaming libraries!
+# Enable Multilib for Steam and 32-bit gaming libraries
 sed -i 's/^#\[multilib\]/\[multilib\]/' /etc/pacman.conf
 sed -i '/^\[multilib\]/{n;s/^#//}' /etc/pacman.conf
 
-# FIXED: Install CachyOS repos automatically (It auto-detects 9950X optimizations natively)
+# Install CachyOS repos
 curl -sO https://mirror.cachyos.org/cachyos-repo.tar.xz
 tar xvf cachyos-repo.tar.xz && cd cachyos-repo && ./cachyos-repo.sh && cd ..
 
@@ -42,9 +42,10 @@ pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorl
 echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 pacman -Syy
 
-# FIXED: Updated the noto-fonts names so they successfully download!
+# THE FIX: Added linux-cachyos kernels explicitly, removed standard nvidia-open
 pacman -Syu --needed --noconfirm \
-    amd-ucode linux-cachyos-nvidia-open nvidia-open nvidia-utils lib32-nvidia-utils \
+    linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open \
+    amd-ucode nvidia-utils lib32-nvidia-utils \
     wayland wayland-protocols libinput libdrm libxkbcommon pixman \
     qt6-wayland qt5-wayland xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
     mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader libva-nvidia-driver \
@@ -57,16 +58,23 @@ pacman -Syu --needed --noconfirm \
     wl-clipboard cliphist wtype \
     swaylock swayidle mako grim slurp wlogout network-manager-applet blueman
 
+# THE FIX: Nuke the stock unoptimized kernel so mkinitcpio doesn't crash trying to build it!
+pacman -Rns --noconfirm linux || true
+rm -f /etc/mkinitcpio.d/linux.preset
+
+# THE FIX: Generate secure boot keys BEFORE mkinitcpio so the hooks don't complain
+sbctl create-keys || true
+sbctl enroll-keys -m || true
+
 sed -i 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /' /etc/mkinitcpio.conf
 mkinitcpio -P
+
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet nvidia-drm.modeset=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on"/' /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
-sbctl create-keys
-sbctl enroll-keys -m || true
-sbctl sign -s $(find /boot -name "*.efi" | grep -i "grub" | head -n 1)
-sbctl sign -s /boot/vmlinuz-linux-cachyos
+sbctl sign -s $(find /boot -name "*.efi" | grep -i "grub" | head -n 1) || true
+sbctl sign -s /boot/vmlinuz-linux-cachyos || true
 
 mkdir -p /home/$USERNAME/build && cd /home/$USERNAME/build
 git clone -b 0.19.2 https://gitlab.freedesktop.org/wlroots/wlroots.git
