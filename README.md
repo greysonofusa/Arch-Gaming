@@ -1,7 +1,7 @@
 ### Preview
  ![Waybar Preview]( waybar-preview2.svg)
 
-![Waybar Preview](waybar-preview.svg)
+![Waybar Preview](waybar-1080p-preview.png)
 ![Desktop Preview](wallpaper.jpg)
 
 ### Installation Instructions
