@@ -18,12 +18,19 @@ chmod +x install.sh chroot.sh
 ```
 ### Installation Instructions System Already Installed: waybar/wofi/wtype:
 Make sure you install dependencies:
-Arch: ```bash pacman -S waybar wofi wtype```
-Debian/Ubuntu: ```bash apt install waybar wofi wtype```
-Download the waybar .jsonc and .css files to ~Downloads folder:
+Arch: 
+``bash
+pacman -S waybar wofi wtype
+```
+``` 
+Debian/Ubuntu:
+```bash
+apt install waybar wofi wtype
+```
+Download the waybar .jsonc and .css file to ~/Downloads folder:
  
  ```bash
- cp ~/Downloads/config.jsonc ~/.config/waybar/config.jsonc
+cp ~/Downloads/config.jsonc ~/.config/waybar/config.jsonc
 cp ~/Downloads/style.css ~/.config/waybar/style.css
 mkdir -p ~/.config/waybar/scripts
 cp ~/Downloads/file-menu.sh ~/.config/waybar/scripts/
