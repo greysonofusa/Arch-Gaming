@@ -45,7 +45,7 @@ rm chaotic-*.pkg.tar.zst
 echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 pacman -Syy
 
-# THE FIX: Added cmake, glslang, vulkan-headers, libdisplay-info, hwdata, seatd, nlohmann-json
+# Added xorg-xwayland so the secure bridge is available to the compiler and Steam
 pacman -Syu --needed --noconfirm \
     linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open \
     amd-ucode nvidia-utils lib32-nvidia-utils \
@@ -61,7 +61,7 @@ pacman -Syu --needed --noconfirm \
     wl-clipboard cliphist wtype \
     swaylock swayidle mako grim slurp wlogout network-manager-applet blueman \
     f2fs-tools dosfstools btrfs-progs \
-    cmake glslang vulkan-headers libdisplay-info seatd hwdata nlohmann-json
+    cmake glslang vulkan-headers libdisplay-info seatd hwdata nlohmann-json xorg-xwayland
 
 pacman -Rns --noconfirm linux || true
 rm -f /etc/mkinitcpio.d/linux.preset
@@ -79,25 +79,25 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sbctl sign -s $(find /boot -name "*.efi" | grep -i "grub" | head -n 1) || true
 sbctl sign -s /boot/vmlinuz-linux-cachyos || true
 
-# THE FIX: Hardcoded direct paths so repos never accidentally nest inside each other!
 mkdir -p /home/$USERNAME/build
 cd /home/$USERNAME/build
 
+# Explicitly enabled xwayland and disabled werror for the strict GCC 15 compiler
 git clone -b 0.19.2 https://gitlab.freedesktop.org/wlroots/wlroots.git
 cd wlroots
-meson setup build -Dprefix=/usr
+meson setup build -Dprefix=/usr -Dwerror=false -Dxwayland=enabled
 ninja -C build install
 
 cd /home/$USERNAME/build
 git clone -b 0.4.1 https://github.com/wlrfx/scenefx.git
 cd scenefx
-meson setup build -Dprefix=/usr
+meson setup build -Dprefix=/usr -Dwerror=false
 ninja -C build install
 
 cd /home/$USERNAME/build
 git clone https://github.com/mangowm/mango.git
 cd mango
-meson setup build -Dprefix=/usr
+meson setup build -Dprefix=/usr -Dwerror=false
 ninja -C build install
 
 cat << 'EOF' > /home/$USERNAME/.bash_profile
