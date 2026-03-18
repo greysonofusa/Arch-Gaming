@@ -17,7 +17,7 @@ chmod +x install.sh chroot.sh
 # 3. Run the Automated Installer
 ./install.sh
 ```
-# Installation Instructions System Already Installed: waybar/wofi/wtype:
+# Installation Instructions Arch/ Debian based post install: waybar/wofi/wtype:
 Make sure you install dependencies:
 ### Arch: 
 ```bash
