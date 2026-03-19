@@ -1,0 +1,61 @@
+window {
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 13px;
+    background-color: rgba(22, 22, 28, 0.98);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: #e8e8e8;
+    padding: 4px 0;
+}
+
+/* Hide search bar - multiple selectors to catch all versions */
+#input,
+.entry,
+entry,
+textview,
+text {
+    min-height: 0;
+    min-width: 0;
+    max-height: 0;
+    max-width: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+    opacity: 0;
+}
+
+#outer-box {
+    margin: 0;
+    padding: 0;
+}
+
+#inner-box {
+    margin: 0;
+    padding: 2px 0;
+}
+
+#scroll {
+    margin: 0;
+    padding: 0;
+}
+
+#entry {
+    padding: 7px 16px;
+    border-radius: 0;
+    margin: 0;
+    color: #e0e0e0;
+    background-color: transparent;
+}
+
+#entry:selected {
+    background-color: rgba(10, 132, 255, 0.80);
+    color: #ffffff;
+    border-radius: 4px;
+    margin: 0 4px;
+    padding: 7px 12px;
+}
+
+#text {
+    font-size: 13px;
+    color: inherit;
+}
